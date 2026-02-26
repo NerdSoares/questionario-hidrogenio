@@ -21,42 +21,36 @@ COLUNAS = [
 
 # --- FUNÇÃO PARA SALVAR NO GOOGLE SHEETS ---
 def save_to_sheets(data_dict, nome):
-    def save_to_sheets(data_dict, nome):
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-
-        # --- NOVO SISTEMA DE SEGURANÇA ---
+        
+        # --- SISTEMA DE SEGURANÇA ---
         if "gcp_service_account" in st.secrets:
-            # Se estiver rodando na nuvem, pega as senhas do cofre do Streamlit
             creds_dict = dict(st.secrets["gcp_service_account"])
             creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
         else:
-            # Se estiver rodando no seu computador, usa o arquivo json normal
             creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
-        # ---------------------------------
 
         client = gspread.authorize(creds)
         sheet = client.open("Respostas_SWING_Itaipu").sheet1
-        # PASSO A: Verificação à prova de balas do cabeçalho
-        # Puxa o valor exato da célula A1. 
+
+        # PASSO A: Verificação do cabeçalho
         try:
             valor_a1 = sheet.acell('A1').value
         except:
             valor_a1 = None
 
-        # Se A1 não for o início do nosso cabeçalho, força a inserção na linha 1
         if valor_a1 != "Data/Hora":
             sheet.insert_row(COLUNAS, 1)
 
         # PASSO B: Monta a linha de dados
         row = [datetime.now().strftime("%d/%m/%Y %H:%M:%S"), nome]
-
-        # Extrai os valores exatamente na ordem das colunas
+        
         for val in data_dict["Dimensões"].values(): row.append(val)
         for cat in ["Econômica", "Ambiental", "Técnica", "Estratégica", "Social"]:
             for val in data_dict[cat].values(): row.append(val)
 
-        # PASSO C: Salva os dados do decisor (o append_row joga na primeira linha vazia)
+        # PASSO C: Salva os dados
         sheet.append_row(row)
         return True
     except Exception as e:
@@ -128,3 +122,4 @@ if st.button("Finalizar e Enviar Respostas", disabled=not liberar_botao):
         if save_to_sheets(results, nome_decisor):
             st.balloons()
             st.success(f"Excelente, {nome_decisor}! Seus dados foram salvos com sucesso.")
+
