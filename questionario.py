@@ -1,12 +1,10 @@
-
-
 import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="Questionário SWING - Itaipu", layout="wide")
+st.set_page_config(page_title="Questionário SWING - Itaipu", layout="centered")
 
 # --- LISTA DEFINITIVA DE COLUNAS (CABEÇALHO) ---
 COLUNAS = [
@@ -19,12 +17,19 @@ COLUNAS = [
     "Soc_Aceitação", "Soc_Legitimidade", "Soc_Reputação"
 ]
 
+# --- INICIALIZAÇÃO DA MEMÓRIA (SESSION STATE) ---
+if 'passo' not in st.session_state:
+    st.session_state.passo = 0
+if 'respostas' not in st.session_state:
+    st.session_state.respostas = {}
+if 'nome' not in st.session_state:
+    st.session_state.nome = ""
+
 # --- FUNÇÃO PARA SALVAR NO GOOGLE SHEETS ---
 def save_to_sheets(data_dict, nome):
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         
-        # --- SISTEMA DE SEGURANÇA ---
         if "gcp_service_account" in st.secrets:
             creds_dict = dict(st.secrets["gcp_service_account"])
             creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
@@ -34,7 +39,6 @@ def save_to_sheets(data_dict, nome):
         client = gspread.authorize(creds)
         sheet = client.open("Respostas_SWING_Itaipu").sheet1
 
-        # PASSO A: Verificação do cabeçalho
         try:
             valor_a1 = sheet.acell('A1').value
         except:
@@ -43,44 +47,36 @@ def save_to_sheets(data_dict, nome):
         if valor_a1 != "Data/Hora":
             sheet.insert_row(COLUNAS, 1)
 
-        # PASSO B: Monta a linha de dados
         row = [datetime.now().strftime("%d/%m/%Y %H:%M:%S"), nome]
         
         for val in data_dict["Dimensões"].values(): row.append(val)
         for cat in ["Econômica", "Ambiental", "Técnica", "Estratégica", "Social"]:
             for val in data_dict[cat].values(): row.append(val)
 
-        # PASSO C: Salva os dados
         sheet.append_row(row)
         return True
     except Exception as e:
         st.error(f"Erro ao salvar: {e}")
         return False
 
-# --- INTERFACE INICIAL ---
-st.title("Questionário de Pesos: Método SWING Hierárquico")
-st.markdown("Avaliação de viabilidade: **Geradores a Diesel vs. Hidrogênio** no Data Center da Itaipu.")
-
-# Captura do nome (usa strip() para evitar que a pessoa digite apenas um "espaço")
-nome_decisor = st.text_input("Por favor, insira seu nome ou identificação profissional:", placeholder="Ex: Engenheiro João Silva").strip()
-
-if not nome_decisor:
-    st.warning("⚠️ O botão de envio no final da página só será liberado após você preencher o seu nome aqui.")
-
-# --- FUNÇÃO DO COMPONENTE SWING ---
-def swing_method_component(section_title, items_data, key_suffix):
+# --- COMPONENTE SWING ATUALIZADO (AGORA COM EXPLICAÇÃO) ---
+def swing_method_component(section_title, items_data, key_suffix, texto_explicativo):
     st.header(section_title)
-    st.info(f"🛑 **PASSO 1:** Imagine que todos os itens abaixo estão no **PIOR NÍVEL**.")
+    
+    # Caixa de explicação da aba
+    st.info(f"💡 **Contexto desta etapa:**\n\n{texto_explicativo}")
+    
+    st.markdown("🛑 **PASSO 1:** Imagine que todos os critérios abaixo estão no **PIOR NÍVEL POSSÍVEL**.")
     for item, description in items_data.items():
         st.markdown(f"- **{item}:** {description}")
-
+    
     st.divider()
-    selected_best = st.radio(f"🏆 **PASSO 2:** Qual melhoraria primeiro?", list(items_data.keys()), key=f"radio_{key_suffix}")
-    st.success(f"**{selected_best}** recebeu 100 pontos.")
-
+    selected_best = st.radio(f"🏆 **PASSO 2:** Qual critério você melhoraria primeiro, puxando do pior para o melhor nível?", list(items_data.keys()), key=f"radio_{key_suffix}")
+    st.success(f"**{selected_best}** recebeu 100 pontos automaticamente.")
+    
     st.divider()
-    st.write(f"⚖️ **PASSO 3:** Pontue os outros em relação a {selected_best} (0-100).")
-
+    st.write(f"⚖️ **PASSO 3:** Agora, pontue os outros critérios em relação a {selected_best} (0-100).")
+    
     scores = {}
     cols = st.columns(2)
     for i, item in enumerate(items_data.keys()):
@@ -93,33 +89,136 @@ def swing_method_component(section_title, items_data, key_suffix):
     return scores
 
 # --- DEFINIÇÃO DOS DADOS ---
-data_dim = {"Econômica": "Custos máximos.", "Ambiental": "Impacto máximo.", "Técnica": "Baixa confiabilidade.", "Estratégica": "Sem alinhamento.", "Social": "Baixa aceitação."}
+data_dim = {"Econômica": "Custos e tarifas máximas.", "Ambiental": "Alto impacto e emissões.", "Técnica": "Baixa confiabilidade.", "Estratégica": "Sem alinhamento corporativo.", "Social": "Baixa aceitação local."}
 data_eco = {"CAPEX": "Investimento altíssimo.", "OPEX": "Custo operacional alto.", "LCOE": "Energia cara."}
-data_amb = {"CO2": "GEE alto.", "NOx": "Poluição local.", "Ruído": "Barulho alto.", "Clima": "Sem metas."}
+data_amb = {"CO2": "Emissões de GEE altas.", "NOx": "Alta poluição local.", "Ruído": "Nível de ruído inaceitável.", "Clima": "Sem metas sustentáveis."}
 data_tec = {"Confiabilidade": "Falhas frequentes.", "Maturidade": "Tecnologia experimental."}
-data_est = {"Alinhamento": "Desalinhado com Itaipu.", "Liderança": "Sem inovação.", "PeD": "Sem fomento H2."}
-data_soc = {"Aceitação": "Rejeição local.", "Legitimidade": "Sem apoio parceiros.", "Reputação": "Dano à imagem."}
+data_est = {"Alinhamento": "Desalinhado com a visão da Itaipu.", "Liderança": "Sem promoção de inovação.", "PeD": "Sem fomento à cadeia de H2."}
+data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apoio de parceiros.", "Reputação": "Dano à imagem institucional."}
 
-# --- ABAS E COLETA DE RESULTADOS ---
-tabs = st.tabs(["1. Dimensões", "2. Econômica", "3. Ambiental", "4. Técnica", "5. Estratégica", "6. Social"])
-results = {}
+# --- LÓGICA DE NAVEGAÇÃO DE PÁGINAS ---
 
-with tabs[0]: results["Dimensões"] = swing_method_component("Nível 1", data_dim, "dim")
-with tabs[1]: results["Econômica"] = swing_method_component("Nível 2: Econômica", data_eco, "eco")
-with tabs[2]: results["Ambiental"] = swing_method_component("Nível 2: Ambiental", data_amb, "amb")
-with tabs[3]: results["Técnica"] = swing_method_component("Nível 2: Técnica", data_tec, "tec")
-with tabs[4]: results["Estratégica"] = swing_method_component("Nível 2: Estratégica", data_est, "est")
-with tabs[5]: results["Social"] = swing_method_component("Nível 2: Social", data_soc, "soc")
+# PASSO 0: INÍCIO E NOME
+if st.session_state.passo == 0:
+    st.title("Avaliação de Alternativas: Diesel vs. Hidrogênio")
+    st.markdown("Bem-vindo ao sistema de levantamento de pesos para o Data Center da Itaipu. Utilizaremos o **Método SWING** para entender as suas prioridades.")
+    
+    nome = st.text_input("Por favor, insira seu nome ou cargo para iniciarmos:", value=st.session_state.nome).strip()
+    
+    if st.button("Iniciar Questionário", type="primary"):
+        if nome:
+            st.session_state.nome = nome
+            st.session_state.passo = 1
+            st.rerun()
+        else:
+            st.error("⚠️ O preenchimento da identificação é obrigatório.")
 
-# --- BOTÃO DE ENVIO COM TRAVA ---
-st.divider()
+# PASSO 1: DIMENSÕES PRINCIPAIS
+elif st.session_state.passo == 1:
+    txt_exp = "Nesta primeira etapa, não pense nos detalhes técnicos ainda. Queremos saber a sua visão macro do projeto: qual a importância relativa entre as 5 grandes áreas (Dimensões) da avaliação?"
+    scores = swing_method_component("Etapa 1 de 6: Dimensões Principais", data_dim, "dim", txt_exp)
+    
+    st.divider()
+    if st.button("Avançar para Dimensão Econômica ➡️", type="primary"):
+        st.session_state.respostas["Dimensões"] = scores
+        st.session_state.passo = 2
+        st.rerun()
 
-# A variável 'liberar_botao' será Verdadeira se o nome tiver pelo menos 1 letra
-liberar_botao = len(nome_decisor) > 0
+# PASSO 2: ECONÔMICA
+elif st.session_state.passo == 2:
+    txt_exp = "Agora estamos dentro da Dimensão Econômica. Avalie a importância entre os diferentes tipos de custos envolvidos na implementação da nova tecnologia."
+    scores = swing_method_component("Etapa 2 de 6: Dimensão Econômica", data_eco, "eco", txt_exp)
+    
+    st.divider()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅️ Voltar"): st.session_state.passo = 1; st.rerun()
+    with col2:
+        if st.button("Avançar para Ambiental ➡️", type="primary"):
+            st.session_state.respostas["Econômica"] = scores
+            st.session_state.passo = 3
+            st.rerun()
 
-if st.button("Finalizar e Enviar Respostas", disabled=not liberar_botao):
-    with st.spinner("Salvando na planilha oficial..."):
-        if save_to_sheets(results, nome_decisor):
-            st.balloons()
-            st.success(f"Excelente, {nome_decisor}! Seus dados foram salvos com sucesso.")
+# PASSO 3: AMBIENTAL
+elif st.session_state.passo == 3:
+    txt_exp = "Foco no Meio Ambiente. Avalie quais impactos ambientais devem ter mais peso na decisão de substituir os geradores a diesel."
+    scores = swing_method_component("Etapa 3 de 6: Dimensão Ambiental", data_amb, "amb", txt_exp)
+    
+    st.divider()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅️ Voltar"): st.session_state.passo = 2; st.rerun()
+    with col2:
+        if st.button("Avançar para Técnica ➡️", type="primary"):
+            st.session_state.respostas["Ambiental"] = scores
+            st.session_state.passo = 4
+            st.rerun()
 
+# PASSO 4: TÉCNICA
+elif st.session_state.passo == 4:
+    txt_exp = "Olhando para a Engenharia. O que é mais crítico para o Data Center: a maturidade da tecnologia escolhida ou a sua confiabilidade operacional?"
+    scores = swing_method_component("Etapa 4 de 6: Dimensão Técnica", data_tec, "tec", txt_exp)
+    
+    st.divider()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅️ Voltar"): st.session_state.passo = 3; st.rerun()
+    with col2:
+        if st.button("Avançar para Estratégica ➡️", type="primary"):
+            st.session_state.respostas["Técnica"] = scores
+            st.session_state.passo = 5
+            st.rerun()
+
+# PASSO 5: ESTRATÉGICA
+elif st.session_state.passo == 5:
+    txt_exp = "Pensando no longo prazo. Como essa escolha tecnológica se alinha com as diretrizes de inovação e liderança da Itaipu e do Parquetec?"
+    scores = swing_method_component("Etapa 5 de 6: Dimensão Estratégica", data_est, "est", txt_exp)
+    
+    st.divider()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅️ Voltar"): st.session_state.passo = 4; st.rerun()
+    with col2:
+        if st.button("Avançar para Social ➡️", type="primary"):
+            st.session_state.respostas["Estratégica"] = scores
+            st.session_state.passo = 6
+            st.rerun()
+
+# PASSO 6: SOCIAL
+elif st.session_state.passo == 6:
+    txt_exp = "Impacto Social e Reputação. Avalie os aspectos de aceitação da comunidade e legitimidade perante a sociedade."
+    scores = swing_method_component("Etapa 6 de 6: Dimensão Social", data_soc, "soc", txt_exp)
+    
+    st.divider()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅️ Voltar"): st.session_state.passo = 5; st.rerun()
+    with col2:
+        if st.button("Revisar e Finalizar ➡️", type="primary"):
+            st.session_state.respostas["Social"] = scores
+            st.session_state.passo = 7
+            st.rerun()
+
+# PASSO 7: TELA FINAL (ENVIO)
+elif st.session_state.passo == 7:
+    st.header("Tudo Pronto, " + st.session_state.nome + "!")
+    st.success("Você concluiu todas as etapas de avaliação. Muito obrigado pelo seu tempo e dedicação.")
+    st.write("Clique no botão abaixo para registrar oficialmente suas escolhas na base de dados da pesquisa.")
+    
+    st.divider()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅️ Voltar e revisar respostas"): st.session_state.passo = 6; st.rerun()
+    with col2:
+        if st.button("📤 Enviar Respostas Definitivas", type="primary"):
+            with st.spinner("Conectando ao banco de dados..."):
+                if save_to_sheets(st.session_state.respostas, st.session_state.nome):
+                    st.balloons()
+                    st.success("✅ Suas respostas foram salvas com sucesso! Você já pode fechar esta página.")
+                    st.session_state.passo = 8 # Trava a tela para evitar reenvio duplo
+                    st.rerun()
+
+# PASSO 8: TELA DE SUCESSO (PÓS ENVIO)
+elif st.session_state.passo == 8:
+    st.title("Questionário Finalizado")
+    st.info("Suas respostas já foram recebidas no servidor. Muito obrigado pela sua contribuição com o projeto de transição energética!")
