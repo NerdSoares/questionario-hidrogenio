@@ -2,6 +2,7 @@ import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+import os # Necessário para verificar a existência dos arquivos de imagem
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Questionário SWING - Itaipu", layout="centered")
@@ -93,7 +94,43 @@ data_eco = {"CAPEX": "Investimento altíssimo.", "OPEX": "Custo operacional alto
 data_amb = {"CO2": "Emissões de GEE altas.", "NOx": "Alta poluição local.", "Ruído": "Nível de ruído inaceitável.", "Clima": "Sem metas sustentáveis."}
 data_tec = {"Confiabilidade": "Falhas frequentes.", "Maturidade": "Tecnologia experimental."}
 data_est = {"Alinhamento": "Desalinhado com a visão da Itaipu.", "Liderança": "Sem promoção de inovação.", "PeD": "Sem fomento à cadeia de H2."}
-data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apoio de parceiros.", "Reputação": "Dano à imagem institucional."}
+data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apoio de parceiros.", "Reputação": "Dano à imagem institutional."}
+
+
+# ==============================================================================
+# --- CABEÇALHO GLOBAL: LOGOS (FICA FORA DA LÓGICA DE PASSOS) ---
+# ==============================================================================
+
+# Definição dos nomes dos arquivos (Melhor prática: evitar espaços e maiúsculas)
+# USUÁRIO DEVE RENOMEAR OS ARQUIVOS JPEG NO GITHUB PARA ESTES NOMES ABAIXO:
+LOGO_BINACIONAL = "itaipu_binacional.jpg"
+LOGO_PARQUETEC = "itaipu_parquetec.jpg"
+
+# Criação de colunas para alinhar os logos lado a lado
+logocol1, logocol2 = st.columns(2)
+
+# Coluna 1: Itaipu Binacional (na frente/esquerda)
+with logocol1:
+    if os.path.exists(LOGO_BINACIONAL):
+        st.image(LOGO_BINACIONAL, width=220) # Ajuste a largura conforme necessário
+    else:
+        # Mostra aviso apenas se o arquivo não existir no GitHub
+        st.warning(f"⚠️ Arquivo '{LOGO_BINACIONAL}' não encontrado no GitHub.")
+
+# Coluna 2: Itaipu Parquetec
+with logocol2:
+    if os.path.exists(LOGO_PARQUETEC):
+        # Alinha à direita para ficar mais estético se as colunas forem largas
+        st.image(LOGO_PARQUETEC, width=220) 
+    else:
+        st.warning(f"⚠️ Arquivo '{LOGO_PARQUETEC}' não encontrado no GitHub.")
+
+# Linha divisória fina abaixo dos logos para separar do conteúdo
+st.divider()
+
+# ==============================================================================
+# ==============================================================================
+
 
 # --- LÓGICA DE NAVEGAÇÃO DE PÁGINAS ---
 
@@ -190,7 +227,7 @@ elif st.session_state.passo == 5:
 
 # PASSO 6: SOCIAL
 elif st.session_state.passo == 6:
-    st.video("https://youtu.be/8XzA2ZWt0Ck") # Vídeo 6 (O mais recente!)
+    st.video("https://youtu.be/8XzA2ZWt0Ck") # Vídeo 6
     txt_exp = "Impacto Social e Reputação. Avalie os aspectos de aceitação da comunidade e legitimidade perante a sociedade."
     scores = swing_method_component("Etapa 6 de 6: Dimensão Social", data_soc, "soc", txt_exp)
     
