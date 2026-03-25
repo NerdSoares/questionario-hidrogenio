@@ -59,11 +59,10 @@ def save_to_sheets(data_dict, nome):
         st.error(f"Erro ao salvar: {e}")
         return False
 
-# --- COMPONENTE SWING ATUALIZADO (AGORA COM EXPLICAÇÃO) ---
+# --- COMPONENTE SWING ---
 def swing_method_component(section_title, items_data, key_suffix, texto_explicativo):
     st.header(section_title)
     
-    # Caixa de explicação da aba
     st.info(f"💡 **Contexto desta etapa:**\n\n{texto_explicativo}")
     
     st.markdown("🛑 **PASSO 1:** Imagine que todos os critérios abaixo estão no **PIOR NÍVEL POSSÍVEL**.")
@@ -101,7 +100,7 @@ data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apo
 # PASSO 0: INÍCIO E NOME
 if st.session_state.passo == 0:
     st.title("Avaliação de Alternativas: Diesel vs. Hidrogênio")
-    st.markdown("Bem-vindo ao sistema de levantamento de pesos para o Data Center da Itaipu. Utilizaremos o **Método SWING** para entender as suas prioridades.")
+    st.markdown("Bem-vindo ao sistema de levantamento de pesos para o Data Center da Itaipu e Parquetec. Utilizaremos o **Método SWING** para entender as suas prioridades.")
     
     nome = st.text_input("Por favor, insira seu nome ou cargo para iniciarmos:", value=st.session_state.nome).strip()
     
@@ -115,7 +114,8 @@ if st.session_state.passo == 0:
 
 # PASSO 1: DIMENSÕES PRINCIPAIS
 elif st.session_state.passo == 1:
-    txt_exp = "Nesta primeira etapa, não pense nos detalhes técnicos ainda. Queremos saber a sua visão macro do projeto: qual a importância relativa entre as 5 grandes áreas (Dimensões) da avaliação?"
+    st.video("hidrogenio1.mp4")
+    txt_exp = "Nesta etapa, não pense nos detalhes técnicos ainda. Queremos saber a sua visão macro do projeto: qual a importância relativa entre as 5 grandes áreas (Dimensões) da avaliação?"
     scores = swing_method_component("Etapa 1 de 6: Dimensões Principais", data_dim, "dim", txt_exp)
     
     st.divider()
@@ -126,7 +126,8 @@ elif st.session_state.passo == 1:
 
 # PASSO 2: ECONÔMICA
 elif st.session_state.passo == 2:
-    txt_exp = "Agora estamos dentro da Dimensão Econômica. Avalie a importância entre os diferentes tipos de custos envolvidos na implementação da nova tecnologia."
+    st.video("hidrogenio2.mp4")
+    txt_exp = "Avalie a importância entre os diferentes tipos de custos envolvidos na implementação da nova tecnologia de hidrogênio."
     scores = swing_method_component("Etapa 2 de 6: Dimensão Econômica", data_eco, "eco", txt_exp)
     
     st.divider()
@@ -141,6 +142,7 @@ elif st.session_state.passo == 2:
 
 # PASSO 3: AMBIENTAL
 elif st.session_state.passo == 3:
+    st.video("hidrogenio3.mp4")
     txt_exp = "Foco no Meio Ambiente. Avalie quais impactos ambientais devem ter mais peso na decisão de substituir os geradores a diesel."
     scores = swing_method_component("Etapa 3 de 6: Dimensão Ambiental", data_amb, "amb", txt_exp)
     
@@ -156,6 +158,7 @@ elif st.session_state.passo == 3:
 
 # PASSO 4: TÉCNICA
 elif st.session_state.passo == 4:
+    st.video("hidrogenio4.mp4")
     txt_exp = "Olhando para a Engenharia. O que é mais crítico para o Data Center: a maturidade da tecnologia escolhida ou a sua confiabilidade operacional?"
     scores = swing_method_component("Etapa 4 de 6: Dimensão Técnica", data_tec, "tec", txt_exp)
     
@@ -171,7 +174,8 @@ elif st.session_state.passo == 4:
 
 # PASSO 5: ESTRATÉGICA
 elif st.session_state.passo == 5:
-    txt_exp = "Pensando no longo prazo. Como essa escolha tecnológica se alinha com as diretrizes de inovação e liderança da Itaipu e do Parquetec?"
+    st.video("hidrogenio5.mp4")
+    txt_exp = "Pensando no longo prazo. Como essa escolha tecnológica se alinha com as diretrizes de inovação e liderança?"
     scores = swing_method_component("Etapa 5 de 6: Dimensão Estratégica", data_est, "est", txt_exp)
     
     st.divider()
@@ -186,6 +190,7 @@ elif st.session_state.passo == 5:
 
 # PASSO 6: SOCIAL
 elif st.session_state.passo == 6:
+    st.video("hidrogenio6.mp4")
     txt_exp = "Impacto Social e Reputação. Avalie os aspectos de aceitação da comunidade e legitimidade perante a sociedade."
     scores = swing_method_component("Etapa 6 de 6: Dimensão Social", data_soc, "soc", txt_exp)
     
@@ -215,7 +220,7 @@ elif st.session_state.passo == 7:
                 if save_to_sheets(st.session_state.respostas, st.session_state.nome):
                     st.balloons()
                     st.success("✅ Suas respostas foram salvas com sucesso! Você já pode fechar esta página.")
-                    st.session_state.passo = 8 # Trava a tela para evitar reenvio duplo
+                    st.session_state.passo = 8 
                     st.rerun()
 
 # PASSO 8: TELA DE SUCESSO (PÓS ENVIO)
