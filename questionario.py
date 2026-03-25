@@ -103,8 +103,8 @@ data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apo
 
 # Definição dos nomes dos arquivos (Melhor prática: evitar espaços e maiúsculas)
 # USUÁRIO DEVE RENOMEAR OS ARQUIVOS JPEG NO GITHUB PARA ESTES NOMES ABAIXO:
-LOGO_BINACIONAL = "itaipu_binacional.jpg"
-LOGO_PARQUETEC = "itaipu_parquetec.jpg"
+LOGO_BINACIONAL = "itaipu_binacional.jpeg"
+LOGO_PARQUETEC = "itaipu_parquetec.jpeg"
 
 # Criação de colunas para alinhar os logos lado a lado
 logocol1, logocol2 = st.columns(2)
