@@ -94,11 +94,11 @@ data_eco = {"CAPEX": "Investimento altíssimo.", "OPEX": "Custo operacional alto
 data_amb = {"CO2": "Emissões de GEE altas.", "NOx": "Alta poluição local.", "Ruído": "Nível de ruído inaceitável.", "Clima": "Sem metas sustentáveis."}
 data_tec = {"Confiabilidade": "Falhas frequentes.", "Maturidade": "Tecnologia experimental."}
 data_est = {"Alinhamento": "Desalinhado com a visão da Itaipu.", "Liderança": "Sem promoção de inovação.", "PeD": "Sem fomento à cadeia de H2."}
-data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apoio de parceiros.", "Reputação": "Dano à imagem institutional."}
+data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apoio de parceiros.", "Reputação": "Dano à imagem institucional."}
 
 
 # ==============================================================================
-# --- CABEÇALHO GLOBAL: LOGOS (FICA FORA DA LÓGICA DE PASSOS) ---
+# --- CABEÇALHO GLOBAL: LOGOS AJUSTADOS (FIXOS NO TOPO) ---
 # ==============================================================================
 
 # Definição dos nomes dos arquivos (Melhor prática: evitar espaços e maiúsculas)
@@ -106,26 +106,29 @@ data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apo
 LOGO_BINACIONAL = "Itaipu_binacional.png"
 LOGO_PARQUETEC = "Itaipu_parquetec.png"
 
-# Criação de colunas para alinhar os logos lado a lado
-logocol1, logocol2 = st.columns(2)
+# Criação de colunas com proporção para dar mais espaço ao Parquetec (que é mais alto/largo)
+# logocol1 é 40% da largura, logocol2 é 60% da largura. Isso centraliza o conjunto.
+logocol1, logocol2 = st.columns([4, 6])
 
 # Coluna 1: Itaipu Binacional (na frente/esquerda)
 with logocol1:
     if os.path.exists(LOGO_BINACIONAL):
-        st.image(LOGO_BINACIONAL, width=220) # Ajuste a largura conforme necessário
+        # use_column_width=True faz o logo Binacional preencher toda a sua coluna,
+        # ficando o maior possível e preenchendo o espaço de forma centralizada.
+        st.image(LOGO_BINACIONAL, use_column_width=True)
     else:
-        # Mostra aviso apenas se o arquivo não existir no GitHub
         st.warning(f"⚠️ Arquivo '{LOGO_BINACIONAL}' não encontrado no GitHub.")
 
 # Coluna 2: Itaipu Parquetec
 with logocol2:
     if os.path.exists(LOGO_PARQUETEC):
-        # Alinha à direita para ficar mais estético se as colunas forem largas
-        st.image(LOGO_PARQUETEC, width=220) 
+        # use_column_width=True faz o logo Parquetec preencher toda a sua coluna.
+        # Como demos mais espaço (60%), ele ficará maior do que estava.
+        st.image(LOGO_PARQUETEC, use_column_width=True)
     else:
         st.warning(f"⚠️ Arquivo '{LOGO_PARQUETEC}' não encontrado no GitHub.")
 
-# Linha divisória fina abaixo dos logos para separar do conteúdo
+# Linha divisória fina abaixo dos logos
 st.divider()
 
 # ==============================================================================
@@ -227,7 +230,7 @@ elif st.session_state.passo == 5:
 
 # PASSO 6: SOCIAL
 elif st.session_state.passo == 6:
-    st.video("https://youtu.be/8XzA2ZWt0Ck") # Vídeo 6
+    st.video("https://youtu.be/8XzA2ZWt0Ck") # Vídeo 6 (O mais recente!)
     txt_exp = "Impacto Social e Reputação. Avalie os aspectos de aceitação da comunidade e legitimidade perante a sociedade."
     scores = swing_method_component("Etapa 6 de 6: Dimensão Social", data_soc, "soc", txt_exp)
     
