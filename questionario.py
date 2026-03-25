@@ -139,7 +139,7 @@ st.divider()
 
 # PASSO 0: INÍCIO E NOME
 if st.session_state.passo == 0:
-    st.title("Avaliação de Alternativas: Diesel vs. Hidrogênio")
+    st.title("Avaliação Multicritério da Viabilidade Econômica do Data Center com Uso de Hidrogênio")
     st.markdown("Bem-vindo ao sistema de levantamento de pesos para o Data Center da Itaipu e Parquetec. Utilizaremos o **Método SWING** para entender as suas prioridades.")
     
     nome = st.text_input("Por favor, insira seu nome ou cargo para iniciarmos:", value=st.session_state.nome).strip()
