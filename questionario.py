@@ -114,7 +114,7 @@ if st.session_state.passo == 0:
 
 # PASSO 1: DIMENSÕES PRINCIPAIS
 elif st.session_state.passo == 1:
-    st.video("hidrogenio1.mp4")
+    st.video("https://youtu.be/9xgrM1Unbmk") # Vídeo 1
     txt_exp = "Nesta etapa, não pense nos detalhes técnicos ainda. Queremos saber a sua visão macro do projeto: qual a importância relativa entre as 5 grandes áreas (Dimensões) da avaliação?"
     scores = swing_method_component("Etapa 1 de 6: Dimensões Principais", data_dim, "dim", txt_exp)
     
@@ -126,7 +126,7 @@ elif st.session_state.passo == 1:
 
 # PASSO 2: ECONÔMICA
 elif st.session_state.passo == 2:
-    st.video("hidrogenio2.mp4")
+    st.video("https://youtu.be/T21b2c8yjm4") # Vídeo 2
     txt_exp = "Avalie a importância entre os diferentes tipos de custos envolvidos na implementação da nova tecnologia de hidrogênio."
     scores = swing_method_component("Etapa 2 de 6: Dimensão Econômica", data_eco, "eco", txt_exp)
     
@@ -142,7 +142,7 @@ elif st.session_state.passo == 2:
 
 # PASSO 3: AMBIENTAL
 elif st.session_state.passo == 3:
-    st.video("hidrogenio3.mp4")
+    st.video("https://youtu.be/ZFjj2DgvHYI") # Vídeo 3
     txt_exp = "Foco no Meio Ambiente. Avalie quais impactos ambientais devem ter mais peso na decisão de substituir os geradores a diesel."
     scores = swing_method_component("Etapa 3 de 6: Dimensão Ambiental", data_amb, "amb", txt_exp)
     
@@ -158,7 +158,7 @@ elif st.session_state.passo == 3:
 
 # PASSO 4: TÉCNICA
 elif st.session_state.passo == 4:
-    st.video("hidrogenio4.mp4")
+    st.video("https://youtu.be/gNoDM3wVYwM") # Vídeo 4
     txt_exp = "Olhando para a Engenharia. O que é mais crítico para o Data Center: a maturidade da tecnologia escolhida ou a sua confiabilidade operacional?"
     scores = swing_method_component("Etapa 4 de 6: Dimensão Técnica", data_tec, "tec", txt_exp)
     
@@ -174,7 +174,7 @@ elif st.session_state.passo == 4:
 
 # PASSO 5: ESTRATÉGICA
 elif st.session_state.passo == 5:
-    st.video("hidrogenio5.mp4")
+    st.video("https://youtu.be/FpnmfL2XqEo") # Vídeo 5
     txt_exp = "Pensando no longo prazo. Como essa escolha tecnológica se alinha com as diretrizes de inovação e liderança?"
     scores = swing_method_component("Etapa 5 de 6: Dimensão Estratégica", data_est, "est", txt_exp)
     
@@ -190,7 +190,7 @@ elif st.session_state.passo == 5:
 
 # PASSO 6: SOCIAL
 elif st.session_state.passo == 6:
-    st.video("hidrogenio6.mp4")
+    st.video("https://youtu.be/8XzA2ZWt0Ck") # Vídeo 6 (O mais recente!)
     txt_exp = "Impacto Social e Reputação. Avalie os aspectos de aceitação da comunidade e legitimidade perante a sociedade."
     scores = swing_method_component("Etapa 6 de 6: Dimensão Social", data_soc, "soc", txt_exp)
     
