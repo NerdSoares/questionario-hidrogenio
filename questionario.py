@@ -103,7 +103,7 @@ data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apo
 
 # Definição dos nomes dos arquivos (Melhor prática: evitar espaços e maiúsculas)
 # USUÁRIO DEVE RENOMEAR OS ARQUIVOS JPEG NO GITHUB PARA ESTES NOMES ABAIXO:
-LOGO_BINACIONAL = "Itaipu_binacional.png"
+LOGO_BINACIONAL = "itaipu_binacional.jpeg"
 
 # Criação de colunas com proporção para dar mais espaço ao Parquetec (que é mais alto/largo)
 # logocol1 é 40% da largura, logocol2 é 60% da largura. Isso centraliza o conjunto.
