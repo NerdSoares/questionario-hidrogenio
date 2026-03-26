@@ -104,7 +104,6 @@ data_soc = {"Aceitação": "Rejeição da comunidade.", "Legitimidade": "Sem apo
 # Definição dos nomes dos arquivos (Melhor prática: evitar espaços e maiúsculas)
 # USUÁRIO DEVE RENOMEAR OS ARQUIVOS JPEG NO GITHUB PARA ESTES NOMES ABAIXO:
 LOGO_BINACIONAL = "Itaipu_binacional.png"
-LOGO_PARQUETEC = "Itaipu_parquetec.png"
 
 # Criação de colunas com proporção para dar mais espaço ao Parquetec (que é mais alto/largo)
 # logocol1 é 40% da largura, logocol2 é 60% da largura. Isso centraliza o conjunto.
@@ -119,14 +118,6 @@ with logocol1:
     else:
         st.warning(f"⚠️ Arquivo '{LOGO_BINACIONAL}' não encontrado no GitHub.")
 
-# Coluna 2: Itaipu Parquetec
-with logocol2:
-    if os.path.exists(LOGO_PARQUETEC):
-        # use_column_width=True faz o logo Parquetec preencher toda a sua coluna.
-        # Como demos mais espaço (60%), ele ficará maior do que estava.
-        st.image(LOGO_PARQUETEC, use_column_width=True)
-    else:
-        st.warning(f"⚠️ Arquivo '{LOGO_PARQUETEC}' não encontrado no GitHub.")
 
 # Linha divisória fina abaixo dos logos
 st.divider()
