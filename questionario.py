@@ -132,7 +132,7 @@ elif 1 <= st.session_state.passo <= 6:
         ("Dimensão Econômica", {"CAPEX": "Investimento", "OPEX": "Operação", "LCOE": "Custo Energia"}, "eco"),
         ("Dimensão Ambiental", {"CO2": "Emissões GEE", "NOx": "Poluentes", "Ruído": "Barulho", "Clima": "Metas"}, "amb"),
         ("Dimensão Técnica", {"Confiabilidade": "Falhas", "Maturidade": "Tecnologia"}, "tec"),
-        ("Dimensão Estratégica", {"Alinhamento": "Visão Itaipu", "Liderança": "Inovação", "PeD": "Cadeia H2"}, "est"),
+        ("Dimensão Estratégica", {"Alinhamento": "Visão Itaipu", "Liderança": "Inovação", "Pesquisa e Desenvolvimento": "Cadeia H2"}, "est"),
         ("Dimensão Social", {"Aceitação": "Comunidade", "Legitimidade": "Parceiros", "Reputação": "Imagem"}, "soc")
     ]
     
