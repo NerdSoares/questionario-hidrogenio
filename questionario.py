@@ -104,8 +104,8 @@ st.divider()
 
 # PASSO 0: INÍCIO (NOME E CARGO)
 if st.session_state.passo == 0:
-    st.title("Pesquisa de Transição Energética")
-    st.markdown("Bem-vindo! Esta pesquisa avalia a viabilidade do Hidrogênio para o Data Center da Itaipu.")
+    st.title("Pesquisa de Viabilidade")
+    st.markdown("Bem-vindo! Esta pesquisa avalia a viabilidade do Hidrogênio para o Data Center da Itaipu Binacional e Itaipu Parquetec.")
     
     col_a, col_b = st.columns(2)
     with col_a:
@@ -162,13 +162,13 @@ elif st.session_state.passo == 7:
 # PASSOS 8-14: NOTAS (0-10)
 elif 8 <= st.session_state.passo <= 14:
     perfs = [
-        ("Alinhamento Climático", "Contribuição para descarbonização.", "Clima"),
-        ("Alinhamento Institucional", "Aderência aos valores da Itaipu.", "Inst"),
-        ("Liderança Tecnológica", "Potencial de referência em inovação.", "Lider"),
-        ("P&D em Hidrogênio", "Desenvolvimento do mercado de H2.", "PD"),
-        ("Aceitação Social", "Percepção da comunidade local.", "Soc"),
-        ("Legitimidade", "Validação por parceiros e critérios ESG.", "Legit"),
-        ("Reputação", "Impacto na imagem da instituição.", "Reput")
+        ("Alinhamento Climático", "É uma avaliação de QUANTO cada tecnologia contribui para metas de descarbonização. ", "Clima"),
+        ("Alinhamento Institucional", "Avalia aderência aos valores e objetivos da Itaipu Binacional.", "Inst"),
+        ("Liderança Tecnológica", "Percepção sobre potencial de posicionar a Itaipu Binacional como referência.", "Lider"),
+        ("P&D em Hidrogênio", "Julgamento sobre contribuição para desenvolvimento do mercado.", "PD"),
+        ("Aceitação Social", "Como a comunidade percebe cada tecnologia. É opinião/percepção social.", "Soc"),
+        ("Legitimidade", "Como parceiros/investidores validam cada escolha. Critério relacional e perceptivo.", "Legit"),
+        ("Reputação", "Impacto na imagem da Itaipu Binacional. Julgamento sobre percepção pública e institucional.", "Reput")
     ]
     curr = perfs[st.session_state.passo - 8]
     d_val, h2_val = performance_component(curr[0], curr[1], curr[2])
