@@ -7,16 +7,16 @@ import os
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Questionário Completo - Itaipu", layout="centered")
 
-# --- LISTA DE COLUNAS (CABEÇALHO ATUALIZADO PARA 14 NOVAS NOTAS) ---
+# --- LISTA DE COLUNAS ATUALIZADA (CABEÇALHO) ---
 COLUNAS = [
-    "Data/Hora", "Nome do Decisor",
+    "Data/Hora", "Nome", "Cargo",
     "Dim_Econômica", "Dim_Ambiental", "Dim_Técnica", "Dim_Estratégica", "Dim_Social",
     "Eco_CAPEX", "Eco_OPEX", "Eco_LCOE",
     "Amb_CO2", "Amb_NOx", "Amb_Ruído", "Amb_Clima",
     "Tec_Confiabilidade", "Tec_Maturidade",
     "Est_Alinhamento", "Est_Liderança", "Est_PeD",
     "Soc_Aceitação", "Soc_Legitimidade", "Soc_Reputação",
-    # Desempenhos Qualitative (Diesel vs H2)
+    # Desempenhos Qualitativos (Diesel vs H2)
     "Perf_Clima_Diesel", "Perf_Clima_H2",
     "Perf_Inst_Diesel", "Perf_Inst_H2",
     "Perf_Lider_Diesel", "Perf_Lider_H2",
@@ -30,9 +30,10 @@ COLUNAS = [
 if 'passo' not in st.session_state: st.session_state.passo = 0
 if 'respostas' not in st.session_state: st.session_state.respostas = {"Pesos": {}, "Desempenhos": {}}
 if 'nome' not in st.session_state: st.session_state.nome = ""
+if 'cargo' not in st.session_state: st.session_state.cargo = ""
 
 # --- FUNÇÃO PARA SALVAR NO GOOGLE SHEETS ---
-def save_to_sheets(respostas, nome):
+def save_to_sheets(respostas, nome, cargo):
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         if "gcp_service_account" in st.secrets:
@@ -43,15 +44,21 @@ def save_to_sheets(respostas, nome):
         client = gspread.authorize(creds)
         sheet = client.open("Respostas_SWING_Itaipu").sheet1
 
-        row = [datetime.now().strftime("%d/%m/%Y %H:%M:%S"), nome]
+        # Prepara a linha com Data, Nome e Cargo
+        row = [datetime.now().strftime("%d/%m/%Y %H:%M:%S"), nome, cargo]
         
-        # Pesos
+        # Adiciona os Pesos na ordem das colunas
         p = respostas["Pesos"]
-        for val in p["Dimensões"].values(): row.append(val)
-        for cat in ["Econômica", "Ambiental", "Técnica", "Estratégica", "Social"]:
-            for val in p[cat].values(): row.append(val)
+        # Ordem: Dimensões -> Econômica -> Ambiental -> Técnica -> Estratégica -> Social
+        if "Dimensões Principais" in p:
+            for val in p["Dimensões Principais"].values(): row.append(val)
         
-        # Desempenhos
+        categorias = ["Dimensão Econômica", "Dimensão Ambiental", "Dimensão Técnica", "Dimensão Estratégica", "Dimensão Social"]
+        for cat in categorias:
+            if cat in p:
+                for val in p[cat].values(): row.append(val)
+        
+        # Adiciona os Desempenhos
         d = respostas["Desempenhos"]
         ordem_perf = ["Clima", "Inst", "Lider", "PD", "Soc", "Legit", "Reput"]
         for crit in ordem_perf:
@@ -68,7 +75,7 @@ def save_to_sheets(respostas, nome):
 def swing_method_component(section_title, items_data, key_suffix, texto_explicativo):
     st.header(section_title)
     st.info(texto_explicativo)
-    selected_best = st.radio(f"🏆 Qual critério você melhoraria primeiro (do pior para o melhor)?", list(items_data.keys()), key=f"radio_{key_suffix}")
+    selected_best = st.radio(f"🏆 Qual critério você melhoraria primeiro?", list(items_data.keys()), key=f"radio_{key_suffix}")
     st.write(f"⚖️ Pontue os outros em relação a {selected_best} (0-100):")
     scores = {}
     for item in items_data.keys():
@@ -85,21 +92,35 @@ def performance_component(title, description, key_prefix):
     return n_d, n_h
 
 # --- CABEÇALHO (LOGOS) ---
+# Alinhado conforme sua última imagem unificada ou ajuste de colunas
 logocol1, logocol2 = st.columns([4, 6])
-with logocol1:
-    if os.path.exists("itaipu_binacional.jpg"): st.image("itaipu_binacional.jpg", use_column_width=True)
-with logocol2:
-    if os.path.exists("itaipu_parquetec.jpg"): st.image("itaipu_parquetec.jpg", use_column_width=True)
+if os.path.exists("itaipu_binacional.jpg"): 
+    with logocol1: st.image("itaipu_binacional.jpg", use_column_width=True)
+if os.path.exists("itaipu_parquetec.jpg"): 
+    with logocol2: st.image("itaipu_parquetec.jpg", use_column_width=True)
 st.divider()
 
 # --- NAVEGAÇÃO ---
 
-# PASSO 0: INÍCIO
+# PASSO 0: INÍCIO (NOME E CARGO)
 if st.session_state.passo == 0:
     st.title("Pesquisa de Transição Energética")
-    nome = st.text_input("Seu nome ou cargo:", value=st.session_state.nome)
-    if st.button("Iniciar", type="primary"):
-        if nome: st.session_state.nome = nome; st.session_state.passo = 1; st.rerun()
+    st.markdown("Bem-vindo! Esta pesquisa avalia a viabilidade do Hidrogênio para o Data Center da Itaipu.")
+    
+    col_a, col_b = st.columns(2)
+    with col_a:
+        nome_input = st.text_input("Seu Nome (Opcional):", value=st.session_state.nome).strip()
+    with col_b:
+        cargo_input = st.text_input("Seu Cargo (Obrigatório):", value=st.session_state.cargo).strip()
+    
+    if st.button("Iniciar Questionário 🚀", type="primary"):
+        if cargo_input: 
+            st.session_state.nome = nome_input
+            st.session_state.cargo = cargo_input
+            st.session_state.passo = 1
+            st.rerun()
+        else:
+            st.error("⚠️ Por favor, informe o seu Cargo para prosseguir.")
 
 # PASSOS 1-6: PESOS (SWING)
 elif 1 <= st.session_state.passo <= 6:
@@ -116,7 +137,7 @@ elif 1 <= st.session_state.passo <= 6:
     ]
     
     curr_data = data_map[st.session_state.passo]
-    res = swing_method_component(curr_data[0], curr_data[1], curr_data[2], "Defina as prioridades desta etapa.")
+    res = swing_method_component(curr_data[0], curr_data[1], curr_data[2], f"Defina as prioridades para {curr_data[0]}.")
     
     col1, col2 = st.columns(2)
     with col1: 
@@ -126,11 +147,16 @@ elif 1 <= st.session_state.passo <= 6:
             st.session_state.respostas["Pesos"][curr_data[0]] = res
             st.session_state.passo += 1; st.rerun()
 
-# PASSO 7: TRANSIÇÃO
+# PASSO 7: TRANSIÇÃO E EXPLICAÇÃO DAS NOTAS
 elif st.session_state.passo == 7:
-    st.title("🎯 Nova Etapa: Notas de Desempenho")
-    st.success("Prioridades definidas! Agora, dê notas de 0 a 10 para o comportamento de cada tecnologia.")
-    st.markdown("Nesta fase, avaliamos os critérios qualitativos.")
+    st.title("🎯 Nova Etapa: Avaliação de Desempenho")
+    st.video("https://youtu.be/69oZ8pPBJIY")
+    st.success("Prioridades definidas! Agora, dê notas de 0 a 10 para cada tecnologia.")
+    st.markdown("""
+    Nesta fase, avaliamos como o **Diesel** e o **Hidrogênio** se comportam nos critérios qualitativos.
+    - **0** = Desempenho Péssimo
+    - **10** = Desempenho Excelente
+    """)
     if st.button("Começar Avaliações ➡️", type="primary"): st.session_state.passo = 8; st.rerun()
 
 # PASSOS 8-14: NOTAS (0-10)
@@ -159,10 +185,12 @@ elif 8 <= st.session_state.passo <= 14:
 # PASSO 15: ENVIO FINAL
 elif st.session_state.passo == 15:
     st.header("Concluído!")
-    if st.button("📤 Enviar para Base de Dados", type="primary"):
-        if save_to_sheets(st.session_state.respostas, st.session_state.nome):
-            st.balloons(); st.session_state.passo = 16; st.rerun()
+    st.write(f"Obrigado, {st.session_state.nome if st.session_state.nome else 'Decisor'}. Suas respostas estão prontas para envio.")
+    if st.button("📤 Enviar Respostas Definitivas", type="primary"):
+        with st.spinner("Enviando dados..."):
+            if save_to_sheets(st.session_state.respostas, st.session_state.nome, st.session_state.cargo):
+                st.balloons(); st.session_state.passo = 16; st.rerun()
 
 elif st.session_state.passo == 16:
-    st.title("Obrigado!")
-    st.info("Respostas registradas.")
+    st.title("Muito Obrigado!")
+    st.info("Suas respostas foram registradas com sucesso. Sua contribuição é fundamental.")
