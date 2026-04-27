@@ -124,7 +124,7 @@ if st.session_state.passo == 0:
 
 # PASSOS 1-6: PESOS (SWING)
 elif 1 <= st.session_state.passo <= 6:
-    vids = ["9xgrM1Unbmk", "T21b2c8yjm4", "ZFjj2DgvHYI", "gNoDM3wVYwM", "FpnmfL2XqEo", "8XzA2ZWt0Ck"]
+    vids = ["9xgrM1Unbmk", "T21b2c8yjm4", "ZFjj2DgvHYI", "gNoDM3wVYwM", "ZyzUX24vIdE", "8XzA2ZWt0Ck"]
     st.video(f"https://youtu.be/{vids[st.session_state.passo-1]}")
     
     data_map = [None, 
