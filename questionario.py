@@ -167,7 +167,7 @@ elif 8 <= st.session_state.passo <= 14:
         ("Liderança Tecnológica", "Percepção sobre potencial de posicionar a Itaipu Binacional como referência.", "Lider"),
         ("P&D em Hidrogênio", "Julgamento sobre contribuição para desenvolvimento do mercado.", "PD"),
         ("Aceitação Social", "Como a comunidade percebe cada tecnologia. É opinião/percepção social.", "Soc"),
-        ("Legitimidade", "Como parceiros/investidores validam cada escolha. Critério relacional e perceptivo.", "Legit"),
+        ("Legitimidade", "Avalie como parceiros e investidores percebem e validam cada escolha tecnológica, com foco no impacto nas relações institucionais.", "Legit"),
         ("Reputação", "Impacto na imagem da Itaipu Binacional. Julgamento sobre percepção pública e institucional.", "Reput")
     ]
     curr = perfs[st.session_state.passo - 8]
